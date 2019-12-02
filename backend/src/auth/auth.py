@@ -156,24 +156,20 @@ def verify_decode_jwt(token):
     }, 400)
 
 
-'''
-@TODO implement @requires_auth(permission) decorator method
-    @INPUTS
-        permission: string permission (i.e. 'post:drink')
-
-    it should use the get_token_auth_header method to get the token
-    it should use the verify_decode_jwt method to decode the jwt
-    it should use the check_permissions method validate claims and check the requested permission
-    return the decorator which passes the decoded payload to the decorated method
-'''
-
-
 def requires_auth(permission=''):
+    '''
+    Decorator fucntion used for adding authorization to endpoints
+    '''
     def requires_auth_decorator(f):
         @wraps(f)
         def wrapper(*args, **kwargs):
+            # get token from header
             token = get_token_auth_header()
+
+            # decode and validate token
             payload = verify_decode_jwt(token)
+
+            # check user permissions
             check_permissions(permission, payload)
             return f(payload, *args, **kwargs)
 
