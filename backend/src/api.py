@@ -16,19 +16,13 @@ CORS(app)
 # db_drop_and_create_all()
 
 # ROUTES
-'''
-@TODO implement endpoint
-    GET /drinks
-        it should be a public endpoint
-        it should contain only the drink.short() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
-'''
 
 
+'''
+Public route for getting all drinks
+'''
 @app.route('/drinks')
 def get_drinks():
-
     # get all drinks
     drinks = Drink.query.all()
 
@@ -47,15 +41,9 @@ def get_drinks():
 
 
 '''
-@TODO implement endpoint
-    GET /drinks-detail
-        it should require the 'get:drinks-detail' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+Route handler for getting detailed representation of all drinks.
+Requires 'get:drinks-detail' permission.
 '''
-
-
 @app.route('/drinks-detail')
 @requires_auth('get:drinks-detail')
 def get_drinks_detail(jwt):
@@ -77,16 +65,9 @@ def get_drinks_detail(jwt):
 
 
 '''
-@TODO implement endpoint
-    POST /drinks
-        it should create a new row in the drinks table
-        it should require the 'post:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
-        or appropriate status code indicating reason for failure
+Route handler for adding new drink.
+Requires 'post:drinks' permission.
 '''
-
-
 @app.route('/drinks', methods=['POST'])
 @requires_auth('post:drinks')
 def add_drink(jwt):
@@ -112,18 +93,9 @@ def add_drink(jwt):
 
 
 '''
-@TODO implement endpoint
-    PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
+Route handler for editing existing drink.
+Requires 'patch:drinks' permission.
 '''
-
-
 @app.route('/drinks/<int:id>', methods=['PATCH'])
 @requires_auth('patch:drinks')
 def edit_drink_by_id(*args, **kwargs):
@@ -142,17 +114,11 @@ def edit_drink_by_id(*args, **kwargs):
 
     # update title if present in body
     if 'title' in body:
-        print('TITLE: ', body['title'])
-        print('TITLE TYPE: ', type(body['title']))
         drink.title = body['title']
 
     # update recipe if present in body
     if 'recipe' in body:
-        print('RECIPE: ', body['recipe'])
-        print('RECIPE TYPE: ', type(body['recipe']))
         drink.recipe = json.dumps(body['recipe'])
-
-    print('UPDATED DRINK: ', drink.long())
 
     try:
         # update drink in database
@@ -175,17 +141,9 @@ def edit_drink_by_id(*args, **kwargs):
 
 
 '''
-@TODO implement endpoint
-    DELETE /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should delete the corresponding row for <id>
-        it should require the 'delete:drinks' permission
-    returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
+Route handler for deleting drink.
+Requires 'delete:drinks' permission.
 '''
-
-
 @app.route('/drinks/<int:id>', methods=['DELETE'])
 @requires_auth('delete:drinks')
 def delete_drink(*args, **kwargs):
