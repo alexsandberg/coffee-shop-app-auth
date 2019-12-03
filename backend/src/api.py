@@ -29,23 +29,14 @@ CORS(app)
 @app.route('/drinks')
 def get_drinks():
 
-    # get all drinks and format using Drink.short()
+    # get all drinks and format using .short()
     drinks = Drink.query.all()
-
-    # drinks_short = [drink.short() for drink in drinks]
-
-    # for num in range(0, len(drinks)):
-    #     print(str(drinks[num]))
-
-    # if no drinks, abort 404
-    # if len(drinks_short) == 0:
-    #     print('ZERO')
-    #     abort(404)
+    drinks_short = [drink.short() for drink in drinks]
 
     # return drinks
     return jsonify({
         'success': True,
-        'drinks': drinks
+        'drinks': drinks_short
     })
 
 
