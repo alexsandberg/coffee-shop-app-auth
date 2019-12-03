@@ -31,19 +31,22 @@ def get_drinks():
 
     # get all drinks and format using Drink.short()
     drinks = Drink.query.all()
-    drinks_short = [drink.short() for drink in drinks]
+
+    # drinks_short = [drink.short() for drink in drinks]
+
+    # for num in range(0, len(drinks)):
+    #     print(str(drinks[num]))
 
     # if no drinks, abort 404
-    if len(drinks_short) == 0:
-        print('ZERO')
-        abort(404)
+    # if len(drinks_short) == 0:
+    #     print('ZERO')
+    #     abort(404)
 
     # return drinks
-    return {
+    return jsonify({
         'success': True,
-        'status': 200,
-        'drinks': drinks_short
-    }
+        'drinks': drinks
+    })
 
 
 '''
@@ -65,6 +68,30 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+
+
+@app.route('/drinks', methods=['POST'])
+@requires_auth('post:drinks')
+def add_drink(jwt):
+    # get the drink info from request
+    body = request.get_json()
+    title = body['title']
+    recipe = body['recipe']
+
+    # create a new drink
+    drink = Drink(title=title, recipe=json.dumps(recipe))
+
+    try:
+        # add drink to the database
+        drink.insert()
+    except Exception as e:
+        print('ERROR: ', str(e))
+        abort(422)
+
+    return jsonify({
+        "success": True,
+        "drinks": drink.long()
+    })
 
 
 '''
@@ -109,7 +136,7 @@ def unprocessable(error):
 @TODO implement error handlers using the @app.errorhandler(error) decorator
     each error handler should return (with approprate messages):
              jsonify({
-                    "success": False, 
+                    "success": False,
                     "error": 404,
                     "message": "resource not found"
                     }), 404
@@ -118,11 +145,11 @@ def unprocessable(error):
 
 '''
 @TODO implement error handler for 404
-    error handler should conform to general task above 
+    error handler should conform to general task above
 '''
 
 
 '''
 @TODO implement error handler for AuthError
-    error handler should conform to general task above 
+    error handler should conform to general task above
 '''
