@@ -13,7 +13,7 @@ CORS(app)
 
 
 # uncomment next line to drop all records and start db from scratch
-db_drop_and_create_all()
+# db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -122,6 +122,56 @@ def add_drink(jwt):
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
         or appropriate status code indicating reason for failure
 '''
+
+
+@app.route('/drinks/<int:id>', methods=['PATCH'])
+@requires_auth('patch:drinks')
+def edit_drink_by_id(*args, **kwargs):
+    # get id from kwargs
+    id = kwargs['id']
+
+    # get drink by id
+    drink = Drink.query.filter_by(id=id).one_or_none()
+
+    # if drink not found
+    if drink is None:
+        abort(404)
+
+    # get request body
+    body = request.get_json()
+
+    # update title if present in body
+    if 'title' in body:
+        print('TITLE: ', body['title'])
+        print('TITLE TYPE: ', type(body['title']))
+        drink.title = body['title']
+
+    # update recipe if present in body
+    if 'recipe' in body:
+        print('RECIPE: ', body['recipe'])
+        print('RECIPE TYPE: ', type(body['recipe']))
+        drink.recipe = json.dumps(body['recipe'])
+
+    print('UPDATED DRINK: ', drink.long())
+
+    try:
+        # update drink in database
+        drink.insert()
+    except Exception as e:
+        # catch exceptions
+        print('EXCEPTION: ', str(e))
+
+        # Bad Request
+        abort(400)
+
+    # array containing .long() representation
+    drink = [drink.long()]
+
+    # return drink to view
+    return jsonify({
+        'success': True,
+        'drinks': drink
+    })
 
 
 '''
