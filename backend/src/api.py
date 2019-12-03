@@ -13,7 +13,7 @@ CORS(app)
 
 
 # uncomment next line to drop all records and start db from scratch
-# db_drop_and_create_all()
+db_drop_and_create_all()
 
 # ROUTES
 '''
@@ -29,8 +29,14 @@ CORS(app)
 @app.route('/drinks')
 def get_drinks():
 
-    # get all drinks and format using .short()
+    # get all drinks
     drinks = Drink.query.all()
+
+    # 404 if no drinks found
+    if len(drinks) == 0:
+        abort(404)
+
+    # format using .short()
     drinks_short = [drink.short() for drink in drinks]
 
     # return drinks
@@ -55,6 +61,12 @@ def get_drinks():
 def get_drinks_detail(jwt):
     # get all drinks and format using .long()
     drinks = Drink.query.all()
+
+    # 404 if no drinks found
+    if len(drinks) == 0:
+        abort(404)
+
+    # format using .long()
     drinks_long = [drink.long() for drink in drinks]
 
     # return drinks
